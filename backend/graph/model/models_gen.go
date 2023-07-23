@@ -2,27 +2,73 @@
 
 package model
 
-type CreateJobListingInput struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Company     string `json:"company"`
-	URL         string `json:"url"`
+type CreateTaskInput struct {
+	OwnerID                string    `json:"ownerId" bson:"ownerId"`
+	Description            string    `json:"description" bson:"description"`
+	Category               *string   `json:"category,omitempty" bson:"category"`
+	TaskRequirements       *string   `json:"taskRequirements,omitempty" bson:"taskRequirements"`
+	Location               *string   `json:"location,omitempty" bson:"location"`
+	Budget                 *float64  `json:"budget,omitempty" bson:"budget"`
+	SpecificSkillsRequired []*string `json:"specificSkillsRequired,omitempty" bson:"specificSkillsRequired"`
+	Urgency                *string   `json:"urgency,omitempty" bson:"urgency"`
+	Priority               *string   `json:"priority,omitempty" bson:"priority"`
+	Status                 *string   `json:"status,omitempty" bson:"status"`
 }
 
-type DeleteJobResponse struct {
-	DeletedJobID string `json:"deletedJobId"`
+type CreateUserInput struct {
+	Username string `json:"username" bson:"username"`
+	Email    string `json:"email" bson:"email"`
+	Password string `json:"password" bson:"password"`
 }
 
-type JobListing struct {
-	ID          string `json:"_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Company     string `json:"company"`
-	URL         string `json:"url"`
+type DeleteTaskResponse struct {
+	DeletedTaskID string `json:"deletedTaskId" bson:"deletedTaskId"`
 }
 
-type UpdateJobListingInput struct {
-	Title       *string `json:"title,omitempty"`
-	Description *string `json:"description,omitempty"`
-	URL         *string `json:"url,omitempty"`
+type DeleteUserResponse struct {
+	DeletedUserID string `json:"deletedUserId" bson:"deletedUserId"`
+}
+
+type Task struct {
+	ID                     string    `json:"_id" bson:"_id"`
+	Owner                  *User     `json:"owner" bson:"owner"`
+	Description            string    `json:"description" bson:"description"`
+	Category               *string   `json:"category,omitempty" bson:"category"`
+	TaskRequirements       *string   `json:"taskRequirements,omitempty" bson:"taskRequirements"`
+	Location               *string   `json:"location,omitempty" bson:"location"`
+	Budget                 *float64  `json:"budget,omitempty" bson:"budget"`
+	SpecificSkillsRequired []*string `json:"specificSkillsRequired,omitempty" bson:"specificSkillsRequired"`
+	Urgency                *string   `json:"urgency,omitempty" bson:"urgency"`
+	Priority               *string   `json:"priority,omitempty" bson:"priority"`
+	Status                 *string   `json:"status,omitempty" bson:"status"`
+}
+
+type UpdateTaskInput struct {
+	Description            *string   `json:"description,omitempty" bson:"description"`
+	Category               *string   `json:"category,omitempty" bson:"category"`
+	TaskRequirements       *string   `json:"taskRequirements,omitempty" bson:"taskRequirements"`
+	Location               *string   `json:"location,omitempty" bson:"location"`
+	Budget                 *float64  `json:"budget,omitempty" bson:"budget"`
+	SpecificSkillsRequired []*string `json:"specificSkillsRequired,omitempty" bson:"specificSkillsRequired"`
+	Urgency                *string   `json:"urgency,omitempty" bson:"urgency"`
+	Priority               *string   `json:"priority,omitempty" bson:"priority"`
+	Status                 *string   `json:"status,omitempty" bson:"status"`
+}
+
+type UpdateUserInput struct {
+	Username *string `json:"username,omitempty" bson:"username"`
+	Email    *string `json:"email,omitempty" bson:"email"`
+	Password *string `json:"password,omitempty" bson:"password"`
+}
+
+type User struct {
+	ID                 string    `json:"_id" bson:"_id"`
+	Username           string    `json:"username" bson:"username"`
+	Email              string    `json:"email" bson:"email"`
+	Password           string    `json:"password" bson:"password"`
+	ContactInformation *string   `json:"contactInformation,omitempty" bson:"contactInformation"`
+	ProfilePicture     *string   `json:"profilePicture,omitempty" bson:"profilePicture"`
+	TaskPreferences    []*string `json:"taskPreferences,omitempty" bson:"taskPreferences"`
+	VerificationStatus *bool     `json:"verificationStatus,omitempty" bson:"verificationStatus"`
+	Tasks              []*Task   `json:"tasks,omitempty" bson:"tasks"`
 }

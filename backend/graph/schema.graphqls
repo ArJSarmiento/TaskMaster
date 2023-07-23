@@ -2,38 +2,90 @@
 #
 # https://gqlgen.com/getting-started/
 
-type JobListing {
+type User {
   _id: ID!
-  title: String!
+  username: String!
+  email: String!
+  password: String!
+  contactInformation: String
+  profilePicture: String
+  taskPreferences: [String]
+  verificationStatus: Boolean
+  tasks: [Task]
+}
+
+type Task {
+  _id: ID!
+  owner: User!
   description: String!
-  company: String!
-  url: String!
+  category: String
+  taskRequirements: String
+  location: String
+  budget: Float
+  specificSkillsRequired: [String]
+  urgency: String
+  priority: String
+  status: String
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  username: String
+  email: String
+  password: String
+}
+
+input CreateTaskInput {
+  ownerId: ID!
+  description: String!
+  category: String
+  taskRequirements: String
+  location: String
+  budget: Float
+  specificSkillsRequired: [String]
+  urgency: String
+  priority: String
+  status: String
+}
+
+input UpdateTaskInput {
+  description: String
+  category: String
+  taskRequirements: String
+  location: String
+  budget: Float
+  specificSkillsRequired: [String]
+  urgency: String
+  priority: String
+  status: String
+}
+
+type DeleteTaskResponse {
+  deletedTaskId: String!
+}
+
+type DeleteUserResponse {
+  deletedUserId: String!
 }
 
 type Query {
-  jobs: [JobListing!]!
-  job(id: ID!): JobListing!
+  users: [User!]!
+  user(id: ID!): User!
+  tasks: [Task!]!
+  task(id: ID!): Task!
 }
 
 type Mutation {
-  createJobListing(input: CreateJobListingInput!): JobListing!
-  updateJobListing(id: ID!, input: UpdateJobListingInput!): JobListing!
-  deleteJobListing(id: ID!): DeleteJobResponse!
-}
-
-input CreateJobListingInput {
-  title: String!
-  description: String!
-  company: String!
-  url: String!
-}
-
-input UpdateJobListingInput {
-  title: String
-  description: String
-  url: String
-}
-
-type DeleteJobResponse {
-  deletedJobId: String!
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(input: ID!): DeleteUserResponse!
+  
+  createTask(input: CreateTaskInput!): Task!
+  updateTask(id: ID!, input: UpdateTaskInput!): Task!
+  deleteTask(id: ID!): DeleteTaskResponse!
 }

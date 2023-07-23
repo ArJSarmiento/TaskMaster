@@ -55,95 +55,105 @@ func Connect() *DB {
 	}
 }
 
-func (db *DB) GetJob(id string) *model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) GetUser(id string) *model.User {
+	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
-	var jobListing model.JobListing
-	err := jobCollec.FindOne(ctx, filter).Decode(&jobListing)
+	var user model.User
+	err := userCollec.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &jobListing
+	return &user
 }
 
-func (db *DB) GetJobs() []*model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) GetUsers() []*model.User {
+	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	var jobListings []*model.JobListing
-	cursor, err := jobCollec.Find(ctx, bson.D{})
+	var users []*model.User
+	cursor, err := userCollec.Find(ctx, bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = cursor.All(context.TODO(), &jobListings); err != nil {
+	if err = cursor.All(context.TODO(), &users); err != nil {
 		panic(err)
 	}
 
-	return jobListings
+	return users
 }
 
-func (db *DB) CreateJobListing(jobInfo model.CreateJobListingInput) *model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) CreateUser(userInfo model.CreateUserInput) *model.User {
+	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	inserg, err := jobCollec.InsertOne(ctx, bson.M{"title": jobInfo.Title, "description": jobInfo.Description, "url": jobInfo.URL, "company": jobInfo.Company})
+	inserg, err := userCollec.InsertOne(ctx, bson.M{
+		"username": userInfo.Username,
+		"email":    userInfo.Email,
+		"password": userInfo.Password,
+	})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
-	returnJobListing := model.JobListing{ID: insertedID, Title: jobInfo.Title, Company: jobInfo.Company, Description: jobInfo.Description, URL: jobInfo.URL}
-	return &returnJobListing
+	returnUser := model.User{
+		ID:       insertedID,
+		Username: userInfo.Username,
+		Email:    userInfo.Email,
+	}
+	return &returnUser
 }
 
-func (db *DB) UpdateJobListing(jobId string, jobInfo model.UpdateJobListingInput) *model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) UpdateUser(userId string, userInfo model.UpdateUserInput) *model.User {
+	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	updateJobInfo := bson.M{}
 
-	if jobInfo.Title != nil {
-		updateJobInfo["title"] = jobInfo.Title
-	}
-	if jobInfo.Description != nil {
-		updateJobInfo["description"] = jobInfo.Description
-	}
-	if jobInfo.URL != nil {
-		updateJobInfo["url"] = jobInfo.URL
+	if userInfo.Username != nil {
+		updateJobInfo["username"] = *userInfo.Username
 	}
 
-	_id, _ := primitive.ObjectIDFromHex(jobId)
+	if userInfo.Email != nil {
+		updateJobInfo["email"] = *userInfo.Email
+	}
+
+	if userInfo.Password != nil {
+		updateJobInfo["password"] = *userInfo.Password
+	}
+
+	_id, _ := primitive.ObjectIDFromHex(userId)
 	filter := bson.M{"_id": _id}
 	update := bson.M{"$set": updateJobInfo}
 
-	results := jobCollec.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
+	results := userCollec.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
 
-	var jobListing model.JobListing
+	var user model.User
 
-	if err := results.Decode(&jobListing); err != nil {
+	if err := results.Decode(&user); err != nil {
 		log.Fatal(err)
 	}
 
-	return &jobListing
+	return &user
 }
 
-func (db *DB) DeleteJobListing(jobId string) *model.DeleteJobResponse {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) DeleteUser(userId string) *model.DeleteUserResponse {
+	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	_id, _ := primitive.ObjectIDFromHex(jobId)
+	_id, _ := primitive.ObjectIDFromHex(userId)
 	filter := bson.M{"_id": _id}
-	_, err := jobCollec.DeleteOne(ctx, filter)
+	_, err := userCollec.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &model.DeleteJobResponse{DeletedJobID: jobId}
+	return &model.DeleteUserResponse{DeletedUserID: userId}
 }

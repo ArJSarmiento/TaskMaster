@@ -8,33 +8,57 @@ import (
 	"context"
 	"crud_ql/database"
 	"crud_ql/graph/model"
+	"fmt"
 )
 
-var db = database.Connect()
-
-// CreateJobListing is the resolver for the createJobListing field.
-func (r *mutationResolver) CreateJobListing(ctx context.Context, input model.CreateJobListingInput) (*model.JobListing, error) {
-	return db.CreateJobListing(input), nil
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+	return db.CreateUser(input), nil
 }
 
-// UpdateJobListing is the resolver for the updateJobListing field.
-func (r *mutationResolver) UpdateJobListing(ctx context.Context, id string, input model.UpdateJobListingInput) (*model.JobListing, error) {
-	return db.UpdateJobListing(id, input), nil
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error) {
+	return db.UpdateUser(id, input), nil
 }
 
-// DeleteJobListing is the resolver for the deleteJobListing field.
-func (r *mutationResolver) DeleteJobListing(ctx context.Context, id string) (*model.DeleteJobResponse, error) {
-	return db.DeleteJobListing(id), nil
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, input string) (*model.DeleteUserResponse, error) {
+	return db.DeleteUser(input), nil
 }
 
-// Jobs is the resolver for the jobs field.
-func (r *queryResolver) Jobs(ctx context.Context) ([]*model.JobListing, error) {
-	return db.GetJobs(), nil
+// CreateTask is the resolver for the createTask field.
+func (r *mutationResolver) CreateTask(ctx context.Context, input model.CreateTaskInput) (*model.Task, error) {
+	panic(fmt.Errorf("not implemented: CreateTask - createTask"))
 }
 
-// Job is the resolver for the job field.
-func (r *queryResolver) Job(ctx context.Context, id string) (*model.JobListing, error) {
-	return db.GetJob(id), nil
+// UpdateTask is the resolver for the updateTask field.
+func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.UpdateTaskInput) (*model.Task, error) {
+	panic(fmt.Errorf("not implemented: UpdateTask - updateTask"))
+}
+
+// DeleteTask is the resolver for the deleteTask field.
+func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (*model.DeleteTaskResponse, error) {
+	panic(fmt.Errorf("not implemented: DeleteTask - deleteTask"))
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	return db.GetUsers(), nil
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	return db.GetUser(id), nil
+}
+
+// Tasks is the resolver for the tasks field.
+func (r *queryResolver) Tasks(ctx context.Context) ([]*model.Task, error) {
+	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+}
+
+// Task is the resolver for the task field.
+func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error) {
+	panic(fmt.Errorf("not implemented: Task - task"))
 }
 
 // Mutation returns MutationResolver implementation.
@@ -45,3 +69,11 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+var db = database.Connect()
