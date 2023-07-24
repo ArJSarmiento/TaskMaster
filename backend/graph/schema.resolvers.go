@@ -8,7 +8,6 @@ import (
 	"context"
 	"crud_ql/graph/model"
 	"crud_ql/repository"
-	"fmt"
 )
 
 // CreateUser is the resolver for the createUser field.
@@ -28,17 +27,17 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, input string) (*model
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.CreateTaskInput) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: CreateTask - createTask"))
+	return db.CreateTask(input), nil
 }
 
 // UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.UpdateTaskInput) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: UpdateTask - updateTask"))
+	return db.UpdateTask(id, input), nil
 }
 
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (*model.DeleteTaskResponse, error) {
-	panic(fmt.Errorf("not implemented: DeleteTask - deleteTask"))
+	return db.DeleteTask(id), nil
 }
 
 // Users is the resolver for the users field.
@@ -53,12 +52,12 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 
 // Tasks is the resolver for the tasks field.
 func (r *queryResolver) Tasks(ctx context.Context) ([]*model.Task, error) {
-	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+	return db.GetTasks(), nil
 }
 
 // Task is the resolver for the task field.
 func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: Task - task"))
+	return db.GetTask(id), nil
 }
 
 // Mutation returns MutationResolver implementation.

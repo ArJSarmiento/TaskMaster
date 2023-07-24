@@ -23,6 +23,11 @@ func (db *DB) GetTask(id string) *model.Task {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Fetch owner/user associated with this task
+	owner := db.GetUser(*task.OwnerID)
+	task.Owner = owner
+
 	return &task
 }
 
@@ -38,6 +43,12 @@ func (db *DB) GetTasks() []*model.Task {
 
 	if err = cursor.All(context.TODO(), &tasks); err != nil {
 		panic(err)
+	}
+
+	// Fetch owner/user associated with this task
+	for _, task := range tasks {
+		owner := db.GetUser(*task.OwnerID)
+		task.Owner = owner
 	}
 
 	return tasks

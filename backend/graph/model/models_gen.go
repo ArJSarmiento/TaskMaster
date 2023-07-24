@@ -32,6 +32,7 @@ type DeleteUserResponse struct {
 type Task struct {
 	ID                     string    `json:"_id" bson:"_id"`
 	Owner                  *User     `json:"owner" bson:"owner"`
+	OwnerID                *string   `json:"ownerId,omitempty" bson:"ownerId"`
 	Description            string    `json:"description" bson:"description"`
 	Category               *string   `json:"category,omitempty" bson:"category"`
 	TaskRequirements       *string   `json:"taskRequirements,omitempty" bson:"taskRequirements"`

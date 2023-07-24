@@ -76,6 +76,7 @@ type ComplexityRoot struct {
 		ID                     func(childComplexity int) int
 		Location               func(childComplexity int) int
 		Owner                  func(childComplexity int) int
+		OwnerID                func(childComplexity int) int
 		Priority               func(childComplexity int) int
 		SpecificSkillsRequired func(childComplexity int) int
 		Status                 func(childComplexity int) int
@@ -291,6 +292,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.Owner(childComplexity), true
+
+	case "Task.ownerId":
+		if e.complexity.Task.OwnerID == nil {
+			break
+		}
+
+		return e.complexity.Task.OwnerID(childComplexity), true
 
 	case "Task.priority":
 		if e.complexity.Task.Priority == nil {
@@ -1049,6 +1057,8 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task__id(ctx, field)
 			case "owner":
 				return ec.fieldContext_Task_owner(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Task_ownerId(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
 			case "category":
@@ -1128,6 +1138,8 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task__id(ctx, field)
 			case "owner":
 				return ec.fieldContext_Task_owner(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Task_ownerId(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
 			case "category":
@@ -1405,6 +1417,8 @@ func (ec *executionContext) fieldContext_Query_tasks(ctx context.Context, field 
 				return ec.fieldContext_Task__id(ctx, field)
 			case "owner":
 				return ec.fieldContext_Task_owner(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Task_ownerId(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
 			case "category":
@@ -1473,6 +1487,8 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task__id(ctx, field)
 			case "owner":
 				return ec.fieldContext_Task_owner(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Task_ownerId(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
 			case "category":
@@ -1741,6 +1757,47 @@ func (ec *executionContext) fieldContext_Task_owner(ctx context.Context, field g
 				return ec.fieldContext_User_tasks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_ownerId(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_ownerId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OwnerID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_ownerId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2498,6 +2555,8 @@ func (ec *executionContext) fieldContext_User_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task__id(ctx, field)
 			case "owner":
 				return ec.fieldContext_Task_owner(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Task_ownerId(ctx, field)
 			case "description":
 				return ec.fieldContext_Task_description(ctx, field)
 			case "category":
@@ -4930,6 +4989,8 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "ownerId":
+			out.Values[i] = ec._Task_ownerId(ctx, field, obj)
 		case "description":
 			out.Values[i] = ec._Task_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5866,6 +5927,22 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {

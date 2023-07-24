@@ -17,6 +17,7 @@ type User {
 type Task {
   _id: ID!
   owner: User!
+  ownerId: ID
   description: String!
   category: String
   taskRequirements: String
