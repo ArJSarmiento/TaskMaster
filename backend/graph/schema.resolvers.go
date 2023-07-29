@@ -14,12 +14,16 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	err := auth.SignUp(ctx, *auth_instance, input)
+	id, err := auth.SignUp(ctx, *auth_instance, input)
 	if err != nil {
 		return nil, err
 	}
 
-	return db.CreateUser(input), nil
+	user, err := db.CreateUser(input, id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -45,6 +49,15 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (*model.DeleteTaskResponse, error) {
 	return db.DeleteTask(id), nil
+}
+
+// SignIn is the resolver for the signIn field.
+func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInRequest) (*model.SignInResponse, error) {
+	response, err := auth.SignIn(ctx, *auth_instance, input)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }
 
 // Users is the resolver for the users field.

@@ -44,23 +44,27 @@ func (db *DB) GetUsers() []*model.User {
 	return users
 }
 
-func (db *DB) CreateUser(userInfo model.CreateUserInput) *model.User {
+func (db *DB) CreateUser(userInfo model.CreateUserInput, id *string) (*model.User, error) {
 	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	inserg, err := userCollec.InsertOne(ctx, userInfo)
 
-	if err != nil {
-		log.Fatal(err)
+	if id != nil {
+		userInfo.ID = id
 	}
 
-	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
+	inserg, err := userCollec.InsertOne(ctx, userInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	insertedID := inserg.InsertedID.(string)
 	returnUser := model.User{
 		ID:       insertedID,
 		Username: userInfo.Username,
 		Email:    userInfo.Email,
 	}
-	return &returnUser
+	return &returnUser, nil
 }
 
 func (db *DB) UpdateUser(userId string, userInfo model.UpdateUserInput) *model.User {

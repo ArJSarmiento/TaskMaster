@@ -16,10 +16,11 @@ type CreateTaskInput struct {
 }
 
 type CreateUserInput struct {
-	Username string `json:"username" bson:"username"`
-	Email    string `json:"email" bson:"email"`
-	Phone    string `json:"phone" bson:"phone"`
-	Password string `json:"password" bson:"password"`
+	ID       *string `json:"_id,omitempty" bson:"_id"`
+	Username string  `json:"username" bson:"username"`
+	Email    string  `json:"email" bson:"email"`
+	Phone    string  `json:"phone" bson:"phone"`
+	Password string  `json:"password" bson:"password"`
 }
 
 type DeleteTaskResponse struct {
@@ -28,6 +29,19 @@ type DeleteTaskResponse struct {
 
 type DeleteUserResponse struct {
 	DeletedUserID string `json:"deletedUserId" bson:"deletedUserId"`
+}
+
+type SignInRequest struct {
+	Username string `json:"username" bson:"username"`
+	Password string `json:"password" bson:"password"`
+}
+
+type SignInResponse struct {
+	AccessToken  *string `json:"access_token,omitempty" bson:"access_token"`
+	ExpiresIn    *string `json:"expires_in,omitempty" bson:"expires_in"`
+	IDToken      *string `json:"id_token,omitempty" bson:"id_token"`
+	RefreshToken *string `json:"refresh_token,omitempty" bson:"refresh_token"`
+	TokenType    *string `json:"token_type,omitempty" bson:"token_type"`
 }
 
 type Task struct {
