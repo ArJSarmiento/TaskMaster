@@ -18,6 +18,7 @@ type CreateTaskInput struct {
 type CreateUserInput struct {
 	Username string `json:"username" bson:"username"`
 	Email    string `json:"email" bson:"email"`
+	Phone    string `json:"phone" bson:"phone"`
 	Password string `json:"password" bson:"password"`
 }
 
@@ -67,6 +68,7 @@ type User struct {
 	Username           string    `json:"username" bson:"username"`
 	Email              string    `json:"email" bson:"email"`
 	Password           string    `json:"password" bson:"password"`
+	Phone              *string   `json:"phone,omitempty" bson:"phone"`
 	ContactInformation *string   `json:"contactInformation,omitempty" bson:"contactInformation"`
 	ProfilePicture     *string   `json:"profilePicture,omitempty" bson:"profilePicture"`
 	TaskPreferences    []*string `json:"taskPreferences,omitempty" bson:"taskPreferences"`

@@ -89,6 +89,7 @@ type ComplexityRoot struct {
 		Email              func(childComplexity int) int
 		ID                 func(childComplexity int) int
 		Password           func(childComplexity int) int
+		Phone              func(childComplexity int) int
 		ProfilePicture     func(childComplexity int) int
 		TaskPreferences    func(childComplexity int) int
 		Tasks              func(childComplexity int) int
@@ -362,6 +363,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Password(childComplexity), true
+
+	case "User.phone":
+		if e.complexity.User.Phone == nil {
+			break
+		}
+
+		return e.complexity.User.Phone(childComplexity), true
 
 	case "User.profilePicture":
 		if e.complexity.User.ProfilePicture == nil {
@@ -852,6 +860,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
 			case "contactInformation":
 				return ec.fieldContext_User_contactInformation(ctx, field)
 			case "profilePicture":
@@ -927,6 +937,8 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
 			case "contactInformation":
 				return ec.fieldContext_User_contactInformation(ctx, field)
 			case "profilePicture":
@@ -1282,6 +1294,8 @@ func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field 
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
 			case "contactInformation":
 				return ec.fieldContext_User_contactInformation(ctx, field)
 			case "profilePicture":
@@ -1346,6 +1360,8 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
 			case "contactInformation":
 				return ec.fieldContext_User_contactInformation(ctx, field)
 			case "profilePicture":
@@ -1745,6 +1761,8 @@ func (ec *executionContext) fieldContext_Task_owner(ctx context.Context, field g
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
 			case "contactInformation":
 				return ec.fieldContext_User_contactInformation(ctx, field)
 			case "profilePicture":
@@ -2339,6 +2357,47 @@ func (ec *executionContext) _User_password(ctx context.Context, field graphql.Co
 }
 
 func (ec *executionContext) fieldContext_User_password(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_phone(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_phone(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Phone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_phone(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -4472,7 +4531,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"username", "email", "password"}
+	fieldsInOrder := [...]string{"username", "email", "phone", "password"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4497,6 +4556,15 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Email = data
+		case "phone":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Phone = data
 		case "password":
 			var err error
 
@@ -5066,6 +5134,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "phone":
+			out.Values[i] = ec._User_phone(ctx, field, obj)
 		case "contactInformation":
 			out.Values[i] = ec._User_contactInformation(ctx, field, obj)
 		case "profilePicture":

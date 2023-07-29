@@ -1,23 +1,13 @@
 # Start from the base golang image
 FROM golang:latest
 
-# Enable Go Modules
-ENV GO111MODULE=on
+RUN mkdir /app
 
-# Set the Current Working Directory inside the container
+ADD . /app
+
 WORKDIR /app
 
-# We copy the rest of the source code from the current directory
-COPY . .
+RUN go build -o server .
 
-# Download all the dependencies
-RUN go mod download
-
-# Install the package
-RUN go install
-
-# This container exposes port 8080 to the outside world
 EXPOSE 8080
-
-# Run the executable
-CMD ["go", "run", "server.go"]
+CMD ["/app/server"]

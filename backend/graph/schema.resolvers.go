@@ -6,12 +6,19 @@ package graph
 
 import (
 	"context"
+	"crud_ql/auth"
 	"crud_ql/graph/model"
 	"crud_ql/repository"
+	"fmt"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+	err := auth.SignUp(ctx, *auth_instance, input)
+	if err != nil {
+		return nil, err
+	}
+
 	return db.CreateUser(input), nil
 }
 
@@ -75,4 +82,9 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) SignUp(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: SignUp - signUp"))
+}
+
 var db = repository.Connect()
+var auth_instance = auth.Init()
