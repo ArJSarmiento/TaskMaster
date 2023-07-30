@@ -12,7 +12,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (db *DB) GetUser(id string) *model.User {
+func (db *DB) GetUserBySub(sub string) (*model.User, error) {
+	userCollec := db.client.Database("graphql-job-board").Collection("user")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	filter := bson.M{"sub": sub}
+	var user model.User
+	err := userCollec.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (db *DB) GetUser(id string) (*model.User, error) {
 	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -22,9 +36,9 @@ func (db *DB) GetUser(id string) *model.User {
 	var user model.User
 	err := userCollec.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &user
+	return &user, nil
 }
 
 func (db *DB) GetUsers() []*model.User {
@@ -44,27 +58,22 @@ func (db *DB) GetUsers() []*model.User {
 	return users
 }
 
-func (db *DB) CreateUser(userInfo model.CreateUserInput, id *string) (*model.User, error) {
+func (db *DB) CreateUser(userInfo model.CreateUserInput, sub *string) (*model.User, error) {
 	userCollec := db.client.Database("graphql-job-board").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if id != nil {
-		userInfo.ID = id
+	if sub != nil {
+		userInfo.Sub = sub
 	}
-
 	inserg, err := userCollec.InsertOne(ctx, userInfo)
+
 	if err != nil {
 		return nil, err
 	}
 
-	insertedID := inserg.InsertedID.(string)
-	returnUser := model.User{
-		ID:       insertedID,
-		Username: userInfo.Username,
-		Email:    userInfo.Email,
-	}
-	return &returnUser, nil
+	insertedID := inserg.InsertedID.(primitive.ObjectID)
+	return db.GetUser(insertedID.Hex())
 }
 
 func (db *DB) UpdateUser(userId string, userInfo model.UpdateUserInput) *model.User {

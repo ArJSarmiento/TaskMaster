@@ -1,0 +1,22 @@
+# Start from the base golang image
+FROM golang:latest
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy only the go.mod and go.sum files to the container
+# and install dependencies before copying the rest of the app.
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the entire application code to the container
+COPY . .
+
+# Build the Go application
+RUN go build -o server .
+
+# Expose port 8080 to the outside world
+EXPOSE 8080
+
+# Define the command to run the application
+CMD ["/app/server"]

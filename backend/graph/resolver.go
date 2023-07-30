@@ -1,7 +1,11 @@
 package graph
 
-// This file will not be regenerated automatically.
-//
-// It serves as dependency injection for your app, add any dependencies you require here.
+import (
+	"crud_ql/auth"
+	"crud_ql/repository"
+)
 
-type Resolver struct{}
+type Resolver struct {
+	DB   *repository.DB
+	AUTH *auth.CognitoClient
+}

@@ -44,11 +44,11 @@ type Task {
 }
 
 input CreateUserInput {
-  _id: ID
   username: String!
   email: String!
   phone: String!
   password: String!
+  sub: String
 }
 
 input UpdateUserInput {

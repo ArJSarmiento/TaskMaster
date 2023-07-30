@@ -14,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func goDotEnvVariable(key string) string {
+func GoDotEnvVariable(key string) string {
 	// load .env file
 	err := godotenv.Load(".env")
 
@@ -33,7 +33,7 @@ func Connect() *DB {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	connectionString := goDotEnvVariable("MONGO_DB_URI")
+	connectionString := GoDotEnvVariable("MONGO_DB_URI")
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionString))
 	if err != nil {
 		log.Fatal(err)

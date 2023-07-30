@@ -16,11 +16,11 @@ type CreateTaskInput struct {
 }
 
 type CreateUserInput struct {
-	ID       *string `json:"_id,omitempty" bson:"_id"`
 	Username string  `json:"username" bson:"username"`
 	Email    string  `json:"email" bson:"email"`
 	Phone    string  `json:"phone" bson:"phone"`
 	Password string  `json:"password" bson:"password"`
+	Sub      *string `json:"sub,omitempty" bson:"sub"`
 }
 
 type DeleteTaskResponse struct {

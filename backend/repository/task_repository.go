@@ -25,7 +25,10 @@ func (db *DB) GetTask(id string) *model.Task {
 	}
 
 	// Fetch owner/user associated with this task
-	owner := db.GetUser(*task.OwnerID)
+	owner, err := db.GetUser(*task.OwnerID)
+	if err != nil {
+		log.Fatal(err)
+	}
 	task.Owner = owner
 
 	return &task
@@ -47,7 +50,10 @@ func (db *DB) GetTasks() []*model.Task {
 
 	// Fetch owner/user associated with this task
 	for _, task := range tasks {
-		owner := db.GetUser(*task.OwnerID)
+		owner, err := db.GetUser(*task.OwnerID)
+		if err != nil {
+			log.Fatal(err)
+		}
 		task.Owner = owner
 	}
 
@@ -66,7 +72,10 @@ func (db *DB) CreateTask(taskInfo model.CreateTaskInput) *model.Task {
 
 	_id := inserg.InsertedID.(primitive.ObjectID)
 
-	user := db.GetUser(taskInfo.OwnerID)
+	user, err := db.GetUser(taskInfo.OwnerID)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &model.Task{
 		ID:                     _id.Hex(),

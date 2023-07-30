@@ -1,28 +1,35 @@
 package main
 
 import (
-	"crud_ql/graph"
 	"log"
 	"net/http"
-	"os"
+
+	"crud_ql/auth"
+	"crud_ql/graph"
+	"crud_ql/repository"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi"
 )
 
-const defaultPort = "8080"
-
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
+	defaultPort := repository.GoDotEnvVariable("DEFAULT_PORT")
+	router := chi.NewRouter()
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	db := repository.Connect()
+	auth_instance := auth.Init()
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	router.Use(auth.Middleware(db, auth_instance))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{
+			DB:   db,
+			AUTH: auth_instance,
+		},
+	}))
+	router.Handle("/", playground.Handler("Taskmaster", "/query"))
+	router.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", defaultPort)
+	log.Fatal(http.ListenAndServe(":"+defaultPort, router))
 }

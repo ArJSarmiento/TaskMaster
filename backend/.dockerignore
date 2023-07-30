@@ -1,0 +1,23 @@
+# Ignore Go dependency directory
+vendor/
+
+# Ignore .git directory
+.git
+
+# Ignore all markdown files
+*.md
+
+# Ignore all log files
+*.log
+
+# Ignore temporary files
+*.tmp
+
+# Ignore all binary files
+*.bin
+
+# Ignore all image files
+.gitignore
+README.md
+Dockerfile.*
+docker-compose.yml
