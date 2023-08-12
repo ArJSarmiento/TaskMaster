@@ -21,3 +21,6 @@
 go.work
 
 .env
+node_modules
+bin
+.serverless
