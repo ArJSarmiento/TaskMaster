@@ -38,7 +38,7 @@ func Middleware(db *repository.DB, cognitoClient *CognitoClient) func(http.Handl
 			}
 
 			pubKeyURL := "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
-			formattedURL := fmt.Sprintf(pubKeyURL, os.Getenv("AWS_DEFAULT_REGION"), cognitoClient.UserPoolId)
+			formattedURL := fmt.Sprintf(pubKeyURL, os.Getenv("REGION"), cognitoClient.UserPoolId)
 
 			keySet, err := jwk.Fetch(r.Context(), formattedURL)
 			if err != nil {
