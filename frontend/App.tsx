@@ -1,118 +1,158 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useState, FC} from 'react';
+import * as color from './styles/color';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import styled from 'styled-components/native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Image} from 'react-native';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+interface CustomInputProps {
+  placeholder: string;
+  isPassword?: boolean;
+  onChangeText: (text: string) => void;
+  value: string;
 }
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const CustomInput: FC<CustomInputProps> = ({
+  placeholder,
+  isPassword,
+  onChangeText,
+  value,
+}) => {
+  return (
+    <StyledInput
+      onChangeText={onChangeText}
+      value={value}
+      secureTextEntry={isPassword}
+      textContentType={isPassword ? 'password' : 'none'}
+      placeholder={placeholder}
+      placeholderTextColor={'gray'}
+    />
+  );
+};
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+const App: FC = () => {
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your .
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <Background source={require('./assets/bg.png')} resizeMode="contain">
+      <LogoContainer>
+        <Image source={require('./assets/logo.png')} />
+        <LogoText>TaskMaster</LogoText>
+      </LogoContainer>
+      <FormContainer>
+        <InputContainer>
+          <CustomInput
+            placeholder="Username"
+            onChangeText={setUsername}
+            value={username}
+          />
+          <CustomInput
+            placeholder="Password"
+            onChangeText={setPassword}
+            value={password}
+            isPassword
+          />
+        </InputContainer>
+        <InputContainer>
+          <LoginButton>
+            <LoginButtonText>Login</LoginButtonText>
+          </LoginButton>
+          <OrText>or</OrText>
+          <SignUpButton>
+            <SignUpButtonText>Register</SignUpButtonText>
+          </SignUpButton>
+        </InputContainer>
+      </FormContainer>
+    </Background>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+const {primary, secondary, brand} = color.default;
+
+const Background = styled.ImageBackground`
+  background-color: ${primary};
+  height: 100%;
+  width: 100%;
+`;
+
+const StyledInput = styled.TextInput`
+  width: 100%;
+  height: 56px;
+  margin: 12px;
+  border-width: 1px;
+  padding: 10px;
+  border-radius: 100px;
+  background-color: ${secondary};
+  color: ${primary};
+  border-color: ${secondary};
+`;
+
+const LogoContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-vertical: 20px;
+`;
+
+const LogoText = styled.Text`
+  color: ${secondary};
+  font-size: 24px;
+  font-weight: bold;
+  margin-left: 10px;
+  text-align: center;
+`;
+
+const LoginButton = styled.Pressable`
+  width: 80%;
+  background-color: ${brand};
+  margin: 12px;
+  border-width: 1px;
+  padding: 10px;
+  border-radius: 100px;
+`;
+
+const LoginButtonText = styled.Text`
+  color: ${primary};
+  font-weight: 900;
+  text-align: center;
+  font-size: 18px;
+`;
+
+const SignUpButton = styled.Pressable`
+  width: 80%;
+  margin: 12px;
+  padding: 10px;
+  border-radius: 100px;
+  border-width: 2px;
+  border-color: ${brand};
+`;
+
+const SignUpButtonText = styled.Text`
+  color: ${brand};
+  font-weight: 900;
+  text-align: center;
+  font-size: 16px;
+`;
+
+const FormContainer = styled.View`
+  width: 100%;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+`;
+
+const InputContainer = styled.View`
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`;
+
+const OrText = styled.Text`
+  color: ${secondary};
+  text-align: center;
+`;
 
 export default App;
