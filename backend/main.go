@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
-	"net/http/httptest"
 	"os"
+	"strings"
 
 	"crud_ql/auth"
 	"crud_ql/graph"
@@ -15,53 +15,56 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/go-chi/chi"
+	"github.com/awslabs/aws-lambda-go-api-proxy/core"
+	"github.com/awslabs/aws-lambda-go-api-proxy/gorillamux"
+	"github.com/gorilla/mux"
 )
 
-func lambdaHandler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	router := chi.NewRouter()
+var muxRouter *mux.Router
+
+func init() {
+	muxRouter = mux.NewRouter()
 
 	// Connect to the database and auth
 	db := repository.Connect()
 	auth_instance := auth.Init()
 
-	router.Use(auth.Middleware(db, auth_instance))
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &graph.Resolver{
-			DB:   db,
-			AUTH: auth_instance,
-		},
-	}))
+	muxRouter.Use(auth.Middleware(db, auth_instance))
 
-	// Setup handlers
-	stage := os.Getenv("STAGE")
-	query_sub := fmt.Sprintf("/%s/query", stage)
-	router.Handle("/", playground.Handler("Taskmaster", query_sub))
-	router.Handle("/query", srv)
+	schema := graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}})
+	server := handler.NewDefaultServer(schema)
+	muxRouter.Handle("/query", server)
+	muxRouter.Handle("/", playground.Handler("GraphQL playground", "/query"))
+}
 
-	// Create a new request using the data from the Lambda event.
-	httpReq, err := http.NewRequest(http.MethodGet, req.Path, nil)
+func lambdaHandler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	muxAdapter := gorillamux.New(muxRouter)
+	rsp, err := muxAdapter.Proxy(*core.NewSwitchableAPIGatewayRequestV1(&req))
 	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
+		log.Println(err)
 	}
-
-	// Use an httptest ResponseRecorder to capture the response.
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, httpReq)
-
-	// Convert the httptest.ResponseRecorder result to an APIGatewayProxyResponse.
-	return events.APIGatewayProxyResponse{
-		StatusCode: rec.Code,
-		Body:       rec.Body.String(),
-		Headers: map[string]string{
-			"Content-Type":                 "*/*",
-			"Access-Control-Allow-Origin":  "*",
-			"Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-			"Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
-		},
-	}, nil
+	newRsp := &events.APIGatewayProxyResponse{
+		Body:       rsp.Version1().Body,
+		StatusCode: rsp.Version1().StatusCode,
+		Headers:    rsp.Version1().Headers,
+	}
+	return *newRsp, err
 }
 
 func main() {
-	lambda.Start(lambdaHandler)
+	isRunningAtLambda := strings.Contains(os.Getenv("AWS_EXECUTION_ENV"), "AWS_Lambda_")
+
+	if isRunningAtLambda {
+		lambda.Start(lambdaHandler)
+	} else {
+		defaultPort := "7010"
+		port := os.Getenv("PORT")
+
+		if port == "" {
+			port = defaultPort
+		}
+
+		log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+		log.Fatal(http.ListenAndServe(":"+port, muxRouter))
+	}
 }
