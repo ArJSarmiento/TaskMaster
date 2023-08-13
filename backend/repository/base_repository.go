@@ -8,14 +8,18 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func GoDotEnvVariable(key string) string {
-	// load .env file
+	// check if .env file exists
+	if _, err := os.Stat(".env"); os.IsNotExist(err) {
+		return os.Getenv(key)
+	}
+
+	// load.env file
 	err := godotenv.Load(".env")
 
 	if err != nil {

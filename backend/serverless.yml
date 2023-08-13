@@ -1,0 +1,46 @@
+service: taskmaster
+frameworkVersion: '3'
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  appName: ar-pdf-service
+  mongoDbUri: mongodb+srv://ArJSarmiento:5BJDZbdjcnyuzVtH@joblistingplatformtest.l27xygx.mongodb.net/?retryWrites=true&w=majority
+  cognitoAppClientId: ap-southeast-1_gi9SwR8m3
+  cognitoUserPoolId: u5ag68j16nm3tdm4uv09bvjfu
+  defaultPort: 8080
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: dev
+  region: ap-southeast-1
+  memorySize: 3008
+  versionFunctions: false
+  environment:
+    REGION: ${self:provider.region}
+    STAGE: ${self:custom.stage}
+    MONGO_DB_URI: ${self:custom.mongoDbUri}
+    COGNITO_USER_POOL_ID: ${self:custom.cognitoUserPoolId}
+    COGNITO_APP_CLIENT_ID: ${self:custom.cognitoAppClientId}
+    DEFAULT_PORT: ${self:custom.defaultPort}
+  logs:
+    restApi: true
+
+package:
+  patterns:
+    - "!./**"
+    - ./bin/**
+
+functions:
+  graphql:
+    handler: bin/server
+    timeout: 30
+    name: ${self:custom.appName}-${self:custom.stage}-graphql
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
