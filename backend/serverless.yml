@@ -1,13 +1,11 @@
 service: taskmaster
 frameworkVersion: '3'
 
+useDotenv: true
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   appName: ar-pdf-service
-  mongoDbUri: mongodb+srv://ArJSarmiento:5BJDZbdjcnyuzVtH@joblistingplatformtest.l27xygx.mongodb.net/?retryWrites=true&w=majority
-  cognitoAppClientId: ap-southeast-1_gi9SwR8m3
-  cognitoUserPoolId: u5ag68j16nm3tdm4uv09bvjfu
-  defaultPort: 8080
 
 provider:
   name: aws
@@ -19,10 +17,10 @@ provider:
   environment:
     REGION: ${self:provider.region}
     STAGE: ${self:custom.stage}
-    MONGO_DB_URI: ${self:custom.mongoDbUri}
-    COGNITO_USER_POOL_ID: ${self:custom.cognitoUserPoolId}
-    COGNITO_APP_CLIENT_ID: ${self:custom.cognitoAppClientId}
-    DEFAULT_PORT: ${self:custom.defaultPort}
+    MONGO_DB_URI: ${env:MONGO_DB_URI}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    COGNITO_APP_CLIENT_ID: ${env:COGNITO_APP_CLIENT_ID}
+    DEFAULT_PORT: ${env:DEFAULT_PORT}
   logs:
     restApi: true
 
@@ -44,3 +42,15 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - cognito-idp:AdminInitiateAuth
+          - cognito-idp:AdminCreateUser
+          - cognito-idp:AdminConfirmSignUp
+          - cognito-idp:AdminSetUserPassword
+        Resource: 
+          - "*"
+
+plugins:
+  - serverless-iam-roles-per-function

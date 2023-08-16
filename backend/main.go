@@ -31,7 +31,12 @@ func init() {
 
 	muxRouter.Use(auth.Middleware(db, auth_instance))
 
-	schema := graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}})
+	schema := graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{
+			DB:   db,
+			AUTH: auth_instance,
+		},
+	})
 	server := handler.NewDefaultServer(schema)
 	muxRouter.Handle("/query", server)
 	muxRouter.Handle("/", playground.Handler("GraphQL playground", "/query"))

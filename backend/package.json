@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "serverless-go-build": "^0.0.6"
+  },
+  "devDependencies": {
+    "serverless-iam-roles-per-function": "^3.2.0"
   }
 }
