@@ -1,7 +1,7 @@
 import {ApolloClient, InMemoryCache} from '@apollo/client';
+import {API_URL} from '@env';
 
-const BASE_URL =
-  'https://2nx6v1ca7d.execute-api.ap-southeast-1.amazonaws.com/dev/query';
+const BASE_URL = API_URL || 'http://localhost:8080/query';
 
 // Initialize Apollo Client
 const client = new ApolloClient({

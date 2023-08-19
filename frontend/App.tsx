@@ -3,12 +3,15 @@ import React, {FC} from 'react';
 import {AppRegistry} from 'react-native';
 import {ApolloProvider} from '@apollo/client';
 import client from './client';
-import Login from './src/views/Login';
+import {AuthProvider} from './src/contexts/AuthContext';
+import Authentication from './src/screens/Authentication';
 
 const App: FC = () => {
   return (
     <ApolloProvider client={client}>
-      <Login />
+      <AuthProvider>
+        <Authentication />
+      </AuthProvider>
     </ApolloProvider>
   );
 };
