@@ -15,17 +15,25 @@ type User {
   tasks: [Task]
 }
 
-input SignInRequest{
+input SignInRequest {
   username: String!
   password: String!
 }
 
-type SignInResponse{
+type SignInResponse {
   access_token: String
   expires_in: String
   id_token: String
   refresh_token: String
   token_type: String
+}
+
+input LogoutRequest {
+  access_token: String!
+}
+
+type LogoutResponse {
+  success: Boolean!
 }
 
 type Task {
@@ -101,10 +109,11 @@ type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(input: ID!): DeleteUserResponse!
-  
+
   createTask(input: CreateTaskInput!): Task!
   updateTask(id: ID!, input: UpdateTaskInput!): Task!
   deleteTask(id: ID!): DeleteTaskResponse!
 
   signIn(input: SignInRequest!): SignInResponse!
+  logout(input: LogoutRequest!): LogoutResponse!
 }

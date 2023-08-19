@@ -36,4 +36,12 @@ const SIGN_UP_MUTATION = gql`
   }
 `;
 
-export {SIGN_IN_MUTATION, SIGN_UP_MUTATION};
+const LOGOUT_MUTATION = gql`
+  mutation Logout($access_token: String!) {
+    logout(input: {access_token: $access_token}) {
+      success
+    }
+  }
+`;
+
+export {SIGN_IN_MUTATION, SIGN_UP_MUTATION, LOGOUT_MUTATION};

@@ -31,6 +31,14 @@ type DeleteUserResponse struct {
 	DeletedUserID string `json:"deletedUserId" bson:"deletedUserId"`
 }
 
+type LogoutRequest struct {
+	AccessToken string `json:"access_token" bson:"access_token"`
+}
+
+type LogoutResponse struct {
+	Success bool `json:"success" bson:"success"`
+}
+
 type SignInRequest struct {
 	Username string `json:"username" bson:"username"`
 	Password string `json:"password" bson:"password"`

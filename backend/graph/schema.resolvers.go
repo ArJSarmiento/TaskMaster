@@ -79,6 +79,15 @@ func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInRequest
 	return response, nil
 }
 
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context, input model.LogoutRequest) (*model.LogoutResponse, error) {
+	err := auth.Logout(ctx, *r.AUTH, input)
+	if err != nil {
+		return &model.LogoutResponse{Success: false}, err
+	}
+	return &model.LogoutResponse{Success: true}, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	if user := auth.ForContext(ctx); user == nil {

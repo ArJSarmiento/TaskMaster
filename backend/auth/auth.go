@@ -76,3 +76,16 @@ func SignIn(ctx context.Context, cognitoClient CognitoClient, input model.SignIn
 
 	return &res, nil
 }
+
+func Logout(ctx context.Context, cognitoClient CognitoClient, input model.LogoutRequest) error {
+	signOutInput := &cip.GlobalSignOutInput{
+		AccessToken: aws.String(input.AccessToken),
+	}
+
+	_, err := cognitoClient.GlobalSignOut(ctx, signOutInput)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -3,13 +3,14 @@ import {useMutation} from '@apollo/client';
 import {
   SIGN_UP_MUTATION,
   SIGN_IN_MUTATION,
+  LOGOUT_MUTATION,
 } from '../services/graphql/mutations';
 import Toast from 'react-native-simple-toast';
 
 interface AuthContextProps {
   isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: (access_token: string) => void;
   signup: (
     username: string,
     email: string,
@@ -36,6 +37,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({children}) => {
     errorPolicy: 'all',
   });
   const [signUp, {error: signUpError}] = useMutation(SIGN_UP_MUTATION, {
+    errorPolicy: 'all',
+  });
+  const [signOut, {error: signOutError}] = useMutation(LOGOUT_MUTATION, {
     errorPolicy: 'all',
   });
 
@@ -69,9 +73,34 @@ export const AuthProvider: FC<AuthProviderProps> = ({children}) => {
     [signIn, signInError],
   );
 
-  const logout = useCallback(() => {
-    setIsAuthenticated(false);
-  }, []);
+  const logout = useCallback(
+    async (access_token: string) => {
+      try {
+        const {data} = await signOut({
+          variables: {access_token},
+        });
+        if (data && data.signOut && data.signOut.success === true) {
+          setIsAuthenticated(false);
+          notifyMessage('Logout successful');
+        }
+        if (!signOutError) {
+          return;
+        }
+        if (
+          signOutError.graphQLErrors &&
+          signOutError.graphQLErrors.length > 0
+        ) {
+          const errorMessage = signOutError.graphQLErrors[0].message;
+          notifyMessage(errorMessage);
+        } else {
+          notifyMessage(signOutError?.message);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [signOut, signOutError],
+  );
 
   const signup = useCallback(
     async (
