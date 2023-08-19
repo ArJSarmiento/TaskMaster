@@ -4,15 +4,18 @@ import {AppRegistry} from 'react-native';
 import {ApolloProvider} from '@apollo/client';
 import client from './client';
 import {AuthProvider} from './src/contexts/AuthContext';
-import Authentication from './src/screens/Authentication';
+import HomeScreen from './src/navigation/HomeScreen';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 const App: FC = () => {
   return (
-    <ApolloProvider client={client}>
-      <AuthProvider>
-        <Authentication />
-      </AuthProvider>
-    </ApolloProvider>
+    <SafeAreaProvider>
+      <ApolloProvider client={client}>
+        <AuthProvider>
+          <HomeScreen />
+        </AuthProvider>
+      </ApolloProvider>
+    </SafeAreaProvider>
   );
 };
 

@@ -1,13 +1,17 @@
 import React, {useState, useEffect, useContext, FC} from 'react';
 import * as color from '../styles/color';
 
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+
 import styled from 'styled-components/native';
 import {Image, ActivityIndicator} from 'react-native';
 import Toast from 'react-native-simple-toast';
 import CustomInput from '../components/AuthenticationCustomInputs';
 import {AuthContext} from '../contexts/AuthContext';
 
-const Authentication: FC = () => {
+const Authentication: FC<{navigation: NavigationProp<ParamListBase>}> = ({
+  navigation,
+}) => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -25,7 +29,13 @@ const Authentication: FC = () => {
 
   const handleAuth = async () => {
     setLoading(true);
-    if (!username.trim() || !password.trim()) {
+
+    const isUsernameEmpty = !username.trim();
+    const isPasswordEmpty = !password.trim();
+    const isEmailEmpty = !email.trim();
+    const isPhoneEmpty = !phone.trim();
+
+    if (isUsernameEmpty || isPasswordEmpty) {
       notifyMessage('Please fill in both fields.');
       setLoading(false);
       return;
@@ -34,16 +44,19 @@ const Authentication: FC = () => {
     if (isLogin) {
       await authData?.login(username, password);
       setLoading(false);
+      navigation.navigate('Home');
       return;
     }
 
-    if (!email.trim() || !phone.trim()) {
+    if (isEmailEmpty || isPhoneEmpty) {
       notifyMessage('Please fill in all fields.');
       setLoading(false);
       return;
     }
+
     await authData?.signup(username, email, phone, password);
     setLoading(false);
+    navigation.navigate('Home');
   };
 
   const notifyMessage = (msg: string) => {
